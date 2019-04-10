@@ -1,0 +1,33 @@
+Homework 1 Assessment
+
+Before I started my assignment, I read the Pervasives and List modules and I used many of there functions in this assignment.
+1. I wrote the subset function by recursively calling list.mem function to check if all the elements in a are also in b.
+2. I wrote the equal set function by checking if a and b are subset of each other.
+3. I wrote the set_union function by including all elements in b and recursively adding unique element of a to it the result set.
+4. I wrote the set_intersection function by using list filter to filter out the element in b that is not in a.
+5. I wrote the set_diff function by filtering out all the elements in set a that is also in b.
+6. I wrote the computed fixed point function by recursively comparing x with f x and making f x into a new x.
+7. To solve this problem, I wrote two helper functions
+(1)reachable_rules:
+input: 	1. start symbol
+	2. a list of all rules in the grammar
+	3. a list of reachable rules which have already been traversed through by DFS
+	4. the rest of the all rules we still haven't been iterated through
+
+functionality: find the first rules with left hand side equal to start symbol,
+   	       call search_rhs to get all the reachable rules from this right hand side,
+               then recursively call itself to continue iterated through the rest of the rules.
+
+output: the accumulated list of reached rules
+
+(2)search_rhs:
+input: 	1. a right hand side
+	2. a list of all rules in the grammar
+	3. a list of reachable rules which have already been traversed through
+
+functionality: recursively call itself to find the first nonterminal symbol,
+               call reachable_rules with start symbol equal to the nonterminal,
+               union the result with the other result get from recursively calling search_rhs with rest of the right hand side,
+               return the union set.
+
+Eventually, I wrote the filter_reachable function by calling reachable_rules function and returns the reachable grammar.
