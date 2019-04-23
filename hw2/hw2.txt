@@ -1,0 +1,92 @@
+HW2 Report
+1. convert_grammar
+(1)prod_func (helper function)
+This function takes a set of rules, an accumulator and symbol x as arguments 
+and returns the result of function with input symbol x. This function convert
+the rules to production function. To avoid stack overflow, I used an accumulator
+a to make this function a tail recursion function. 
+(2)convert_grammar
+The function convert_grammar calls get_prod_func takes a grammar as input and 
+convert the second part of grammar to a set of production function. There 
+shouldn't be any weakness in this function or the helper function.
+
+2. parse_tree_leaves
+(1)find_leaves (helper function)
+This function takes a list of parse_tree as argument and recursively call itself
+on the branches of each element in the input parse_tree list. Each call returns a
+list of leaves and the function will combine all the leaves into a list. This
+function isn't a tail recursion function, but I cannot think of a way to write 
+this function in a tail recursion way. Therefore, stack overflow may happen 
+when the parse tree is huge.
+(2)parse_tree_leaves
+If the top of parse_tree is node, this function passes the list of top branches 
+as argument to ptree_list_leaves function and returns the list of leaves get from
+find_leaves helper fucntion. If the parse_tree is a single leaf, the it returns 
+the single element list of the leaf. Same weakness of the helper function applies 
+to this function
+
+3.make_matcher
+(1) slist_match (helper function)
+This function accepts a production function, a list of symbols as input. It recursively
+check the first element of the input symbol list. If the first element is a Terminal, it
+will compare it with the first element in the frag list. If they are the same, it 
+continues comparing the next element by recursive call. If the first element is a non-
+terminal, it check all the possible replacement of this non-terminal by calling function
+for_all_replace.
+(2) for_all_replace (helper function)
+This function accepts a production function, the right-hand-side of the nonterminal, and 
+the rest of the frag following the nonterminal. It replaces the nonterminal by the element
+of right-hand-side one by one, and calls slist_match to see if this replacement works. If
+it works, it returns the result given by slist_match. If it doesn't work, it continues 
+replacing the nonterminal with the next element on the right-hand-side.
+(3) make_matcher
+This function accepts a grammar, breaks it into a pair of start symbol and production function,
+passes produnction function, the right-hand-side of production function and an inital empty
+tail to for_all_replace function to get the suffix of input frag.
+
+There is three main weakness in these 
+function:
+(i) The first one is stack overflow. Both slist_match and for_all_replace function recursively 
+call each other but neither of them are tail recursion function, which may lead to 
+stack overflow when accepting a very complicated fragment. 
+(ii) The second weakness is that the function may go into a infinite loop. For example,
+if a grammar has nonterminal A B C and terminal a, b, c and the grammar is 
+(A, function | A -> [B;C] | B -> [A;a] | C-> [a;b], no matter what fragmet is passed
+to the function, it will continue with the left-most rules which is A->B, B->A, A->B
+... and won't be able to finish, even though there may be other matches of the 
+fragment. 
+(iii) The third weakness is time complexity. As mentioned in the second weakness, even a 
+solvable problem with finite number of fragment and production function can lead to
+an infinite time complexity. Some simple argument may still need tons of time execute.
+
+4.make_parser
+(1) get_replace (helper function)
+This function accepts a production function of the grammar, a right-hand-side of the 
+non-terminal to replace, the rest of frag following the non-terminal and the frag. 
+It calls slist_match function from last problem to test each element in the righ-hand-side
+and returns the first element that match with the frag.
+(2) unused_frag (helper function)
+This function accepts the a prefix of suffix of frag(frag just got used) and the 
+suffix of frag (frag hadn't been until last call), eliminate the elements in the suffix of 
+frag that has been just used 
+(3) get_tree (helper function)
+This function accepts a production function, a start symbol and the tail following the 
+start symbol waiting to be parsed and the frag to match with the start_symb::tail set.
+If the start symbol is a terminal, then it will returns a single node tree. If the start 
+symbol is a nonterminal, it will replaces the nonterminal with the first valid element 
+in the right-hand-side solved by get_replace function and returns the node with branch 
+provided by get_branch function.
+(3) get_branch (helper function)
+This function accepts a production function, a list of symbol, the tail following the list of 
+symbol and frag. It combines the trees get from passes each symbol to get_tree into one nodes.
+(4) make_parser
+This function accepts a grammar and a frag and breaks grammar into start symbol and production
+function. It calls make_matcher to check if there is match for the frag. If not, make_parser 
+return None. Otherwise, it passes the start_symbol of grammar to get_tree to and solve for a 
+parse tree.
+
+I choosed to write make_parse using some part of make_matcher. Since my make_parser has more 
+complexity, I uses make_matcher to see if the fragment can be matched to avoid wasting time 
+solving unsolvable problem.
+Since the function is using the same searching method as make_matcher, it has the same three
+weakness as what I mentioned previously.
